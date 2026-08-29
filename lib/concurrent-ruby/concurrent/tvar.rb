@@ -111,7 +111,7 @@ module Concurrent
           rescue Transaction::LeaveError => e
             transaction.abort
             break result
-          rescue => e
+          rescue Exception => e
             transaction.abort
             raise e
           end
