@@ -32,6 +32,8 @@ module Concurrent
     #
     # @raise [ArgumentError] if no task is given
     def post(executor, *args, &task)
+      raise ArgumentError.new('no block given') unless block_given?
+
       posts [[executor, args, task]]
       true
     end
