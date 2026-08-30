@@ -612,12 +612,18 @@ RSpec.describe 'Concurrent::Promises' do
       expect(event.waiting_threads).to eq 0
 
       waiter = Thread.new { event.wait }
-      Thread.pass until waiter.status == "sleep"
+      begin
+        Thread.pass until waiter.status == "sleep"
 
-      expect(event.waiting_threads).to eq 1
-    ensure
-      event&.resolve(false)
-      waiter&.join
+        expect(event.waiting_threads).to eq 1
+
+        event.resolve(false)
+        waiter.join
+        expect(event.waiting_threads).to eq 0
+      ensure
+        event.resolve(false)
+        waiter.join
+      end
     end
 
     specify "#wait" do
