@@ -607,6 +607,19 @@ RSpec.describe 'Concurrent::Promises' do
   end
 
   describe 'ResolvableEvent' do
+    specify "#waiting_threads" do
+      event = resolvable_event
+      expect(event.waiting_threads).to eq 0
+
+      waiter = Thread.new { event.wait }
+      Thread.pass until waiter.status == "sleep"
+
+      expect(event.waiting_threads).to eq 1
+    ensure
+      event&.resolve(false)
+      waiter&.join
+    end
+
     specify "#wait" do
       event = resolvable_event
       expect(event.wait(0, false)).to be_falsey
