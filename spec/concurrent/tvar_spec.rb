@@ -48,6 +48,22 @@ module Concurrent
       }.to raise_error(StandardError, 'This is an error!')
     end
 
+    it 'aborts and releases locks for exceptions outside StandardError' do
+      t = TVar.new(0)
+      error = Interrupt.new('This is an interrupt!')
+
+      expect {
+        Concurrent::atomically do
+          t.value = 1
+          raise error
+        end
+      }.to raise_error(error)
+
+      expect(t.value).to eq 0
+      expect { Concurrent::atomically { t.value = 2 } }.not_to raise_error
+      expect(t.value).to eq 2
+    end
+
     it 'retries on abort' do
       count = 0
 

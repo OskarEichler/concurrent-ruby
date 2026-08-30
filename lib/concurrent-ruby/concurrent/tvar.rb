@@ -111,9 +111,9 @@ module Concurrent
           rescue Transaction::LeaveError => e
             transaction.abort
             break result
-          rescue Exception => e
+          rescue Exception
             transaction.abort
-            raise e
+            raise
           end
           # If we can commit, break out of the loop
 
